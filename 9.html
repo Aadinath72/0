@@ -3,210 +3,644 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AP & GP Finder</title>
+    <title>Gaming Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+        @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&display=swap');
+        
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            box-sizing: border-box;
+            font-family: 'Oxanium', cursive;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
             min-height: 100vh;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 600px;
+        
+        .game-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .glow {
+            box-shadow: 0 0 15px rgba(89, 115, 255, 0.5);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(89, 115, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(89, 115, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(89, 115, 255, 0); }
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #5973ff, #00d4ff);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
             width: 100%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            text-align: center;
         }
-        h1 {
-            margin-bottom: 20px;
-            font-size: 2.5em;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        
+        .carousel {
+            scroll-behavior: smooth;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1em;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 5px;
-            text-transform: uppercase;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #218838;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            min-height: 50px;
-            display: none;
-            text-align: left;
-        }
-        .output.show {
-            display: block;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        .tab {
-            flex: 1;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
-        }
-        .tab.active {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .tab-content {
+        
+        .carousel::-webkit-scrollbar {
             display: none;
         }
-        .tab-content.active {
-            display: block;
+        
+        .typewriter h1 {
+            overflow: hidden;
+            border-right: 0.15em solid #5973ff;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: 0.15em;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
         }
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 2em;
-            }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #5973ff }
+        }
+        
+        .game-icon {
+            filter: drop-shadow(0 0 5px rgba(89, 115, 255, 0.7));
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>AP & GP Finder</h1>
-        <p>Calculate an Arithmetic or Geometric Progression. Enter the parameters and click calculate.</p>
+    <div id="app" class="min-h-screen pb-20">
+        <!-- Navigation -->
+        <nav class="bg-gray-900 bg-opacity-80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-700">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">GAME HUB</h1>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="nav-link text-white font-semibold">Home</a>
+                    <a href="#" class="nav-link text-gray-400 hover:text-white">Games</a>
+                    <a href="#" class="nav-link text-gray-400 hover:text-white">Store</a>
+                    <a href="#" class="nav-link text-gray-400 hover:text-white">Community</a>
+                    <a href="#" class="nav-link text-gray-400 hover:text-white">Support</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg font-bold hover:opacity-90 transition">
+                        Sign In
+                    </button>
+                    <button class="md:hidden text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
         
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('ap')">Arithmetic Progression (AP)</div>
-            <div class="tab" onclick="switchTab('gp')">Geometric Progression (GP)</div>
-        </div>
+        <!-- Hero Section -->
+        <section class="relative pt-16 pb-32 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-black opacity-60"></div>
+                <img src="https://placeholder-image-service.onrender.com/image/1920x1080?prompt=Epic%20gaming%20collage%20with%20multiple%20game%20characters%20and%20action%20scenes&id=dd90a24f-0c21-4a62-9dcd-e72a0f40b341" alt="Epic gaming collage with multiple game characters and action scenes" class="w-full h-full object-cover">
+            </div>
+            
+            <div class="container mx-auto px-4 relative z-10">
+                <div class="max-w-2xl">
+                    <div class="typewriter mb-6">
+                        <h1 class="text-4xl md:text-6xl font-bold text-white">YOUR ULTIMATE GAMING DESTINATION</h1>
+                    </div>
+                    <p class="text-xl text-gray-300 mb-8">Discover, play, and connect with thousands of games and gamers worldwide.</p>
+                    <div class="flex space-x-4">
+                        <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-lg font-bold text-lg hover:opacity-90 transition pulse">
+                            Explore Games
+                        </button>
+                        <button class="bg-gray-800 bg-opacity-70 text-white px-8 py-3 rounded-lg font-bold text-lg border border-gray-700 hover:bg-opacity-90 transition">
+                            Join Free
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
         
-        <div id="ap-content" class="tab-content active">
-            <div class="form-group">
-                <label for="ap-a">First Term (a):</label>
-                <input type="number" id="ap-a" step="any">
+        <!-- Featured Games -->
+        <section class="py-16 bg-gray-900 bg-opacity-60">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center mb-10">
+                    <h2 class="text-3xl font-bold text-white">Featured Games</h2>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        View All
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Game Card 1 -->
+                    <div class="game-card bg-gray-800 rounded-xl overflow-hidden glow">
+                        <div class="relative">
+                            <img src="https://placeholder-image-service.onrender.com/image/400x250?prompt=Futuristic%20cyberpunk%20game%20with%20neon%20lights%20and%20flying%20cars&id=dd90a24f-0c21-4a62-9dcd-e72a0f40b341" alt="Futuristic cyberpunk game with neon lights and flying cars" class="w-full h-48 object-cover">
+                            <div class="absolute top-4 right-4 bg-red-500 text-xs font-bold px-2 py-1 rounded">
+                                -20%
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">Neon Revolution</h3>
+                            <div class="flex items-center mb-4">
+                                <div class="flex text-yellow-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-2 text-gray-400">4.8 (2.1K)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center mr-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-white font-bold">12.5K</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 line-through mr-2">$59.99</span>
+                                    <span class="text-white font-bold">$47.99</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Card 2 -->
+                    <div class="game-card bg-gray-800 rounded-xl overflow-hidden glow">
+                        <div class="relative">
+                            <img src="https://placeholder-image-service.onrender.com/image/400x250?prompt=Fantasy%20RPG%20with%20dragons%20and%20medieval%20castles&id=dd90a24f-0c21-4a62-9dcd-e72a0f40b341" alt="Fantasy RPG with dragons and medieval castles" class="w-full h-48 object-cover">
+                            <div class="absolute top-4 right-4 bg-green-500 text-xs font-bold px-2 py-1 rounded">
+                                NEW
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">Dragon's Legacy</h3>
+                            <div class="flex items-center mb-4">
+                                <div class="flex text-yellow-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-2 text-gray-400">4.9 (3.4K)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-white font-bold">8.7K</span>
+                                </div>
+                                <div>
+                                    <span class="text-white font-bold">$69.99</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Card 3 -->
+                    <div class="game-card bg-gray-800 rounded-xl overflow-hidden glow">
+                        <div class="relative">
+                            <img src="https://placeholder-image-service.onrender.com/image/400x250?prompt=Racing%20game%20with%20sports%20cars%20on%20a%20city%20track&id=dd90a24f-0c21-4a62-9dcd-e72a0f40b341" alt="Racing game with sports cars on a city track" class="w-full h-48 object-cover">
+                            <div class="absolute top-4 right-4 bg-blue-500 text-xs font-bold px-2 py-1 rounded">
+                                POPULAR
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">Velocity X</h3>
+                            <div class="flex items-center mb-4">
+                                <div class="flex text-yellow-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-2 text-gray-400">4.2 (5.7K)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center mr-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-white font-bold">19.3K</span>
+                                </div>
+                                <div>
+                                    <span class="text-white font-bold">$39.99</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="ap-d">Common Difference (d):</label>
-                <input type="number" id="ap-d" step="any">
-            </div>
-            <div class="form-group">
-                <label for="ap-n">Number of Terms (n):</label>
-                <input type="number" id="ap-n" min="1">
-            </div>
-            <button onclick="calculateAP()">Calculate AP</button>
-            <div id="ap-output" class="output"></div>
-        </div>
+        </section>
         
-        <div id="gp-content" class="tab-content">
-            <div class="form-group">
-                <label for="gp-a">First Term (a):</label>
-                <input type="number" id="gp-a" step="any">
+        <!-- Categories -->
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-white mb-10 text-center">Browse Categories</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <div class="bg-gray-800 bg-opacity-70 rounded-xl p-6 text-center hover:bg-opacity-90 transition cursor-pointer glow">
+                        <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 game-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold">Action</h3>
+                    </div>
+                    
+                    <div class="bg-gray-800 bg-opacity-70 rounded-xl p-6 text-center hover:bg-opacity-90 transition cursor-pointer glow">
+                        <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 game-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0A2.704 2.704 0 013 15.546m18 0V9a6 6 0 00-9-5.197A6 6 0 003 9v6.546" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold">Adventure</h3>
+                    </div>
+                    
+                    <div class="bg-gray-800 bg-opacity-70 rounded-xl p-6 text-center hover:bg-opacity-90 transition cursor-pointer glow">
+                        <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4 game-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold">RPG</h3>
+                    </div>
+                    
+                    <div class="bg-gray-800 bg-opacity-70 rounded-xl p-6 text-center hover:bg-opacity-90 transition cursor-pointer glow">
+                        <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 game-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold">Simulation</h3>
+                    </div>
+                    
+                    <div class="bg-gray-800 bg-opacity-70 rounded-xl p-6 text-center hover:bg-opacity-90 transition cursor-pointer glow">
+                        <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 game-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold">Strategy</h3>
+                    </div>
+                    
+                    <div class="bg-gray-800 bg-opacity-70 rounded-xl p-6 text-center hover:bg-opacity-90 transition cursor-pointer glow">
+                        <div class="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 game-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold">Sports</h3>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="gp-r">Common Ratio (r):</label>
-                <input type="number" id="gp-r" step="any">
+        </section>
+        
+        <!-- Special Offers -->
+        <section class="py-16 bg-gray-900 bg-opacity-60">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-white mb-10">Special Offers</h2>
+                
+                <div class="relative">
+                    <div class="carousel flex space-x-6 overflow-x-auto pb-6">
+                        <!-- Offer 1 -->
+                        <div class="flex-shrink-0 w-80 bg-gradient-to-r from-purple-900 to-blue-900 rounded-xl overflow-hidden glow">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <span class="bg-red-500 text-xs font-bold px-2 py-1 rounded">-30%</span>
+                                    </div>
+                                    <div class="text-3xl font-bold text-white">$41.99</div>
+                                </div>
+                                <h3 class="text-xl font-bold text-white mb-2">Summer Sale</h3>
+                                <p class="text-gray-300 mb-4">Get amazing discounts on selected games. Limited time offer!</p>
+                                <div class="flex items-center text-gray-400 text-sm mb-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Ends in 2 days</span>
+                                </div>
+                                <button class="w-full bg-white text-purple-900 font-bold py-3 rounded-lg hover:bg-gray-100 transition">
+                                    Shop Now
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Offer 2 -->
+                        <div class="flex-shrink-0 w-80 bg-gradient-to-r from-blue-900 to-green-900 rounded-xl overflow-hidden glow">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <span class="bg-green-500 text-xs font-bold px-2 py-1 rounded">FREE</span>
+                                    </div>
+                                    <div class="text-3xl font-bold text-white">$0.00</div>
+                                </div>
+                                <h3 class="text-xl font-bold text-white mb-2">Weekend Free Play</h3>
+                                <p class="text-gray-300 mb-4">Selected games are free to play this weekend only!</p>
+                                <div class="flex items-center text-gray-400 text-sm mb-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Ends in 3 days</span>
+                                </div>
+                                <button class="w-full bg-white text-green-900 font-bold py-3 rounded-lg hover:bg-gray-100 transition">
+                                    Play Now
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Offer 3 -->
+                        <div class="flex-shrink-0 w-80 bg-gradient-to-r from-red-900 to-yellow-900 rounded-xl overflow-hidden glow">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <span class="bg-yellow-500 text-xs font-bold px-2 py-1 rounded">-50%</span>
+                                    </div>
+                                    <div class="text-3xl font-bold text-white">$24.99</div>
+                                </div>
+                                <h3 class="text-xl font-bold text-white mb-2">Indie Game Festival</h3>
+                                <p class="text-gray-300 mb-4">Support independent developers with huge discounts!</p>
+                                <div class="flex items-center text-gray-400 text-sm mb-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 01118 0z" />
+                                    </svg>
+                                    <span>Ends in 5 days</span>
+                                </div>
+                                <button class="w-full bg-white text-red-900 font-bold py-3 rounded-lg hover:bg-gray-100 transition">
+                                    Discover
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="gp-n">Number of Terms (n):</label>
-                <input type="number" id="gp-n" min="1">
+        </section>
+        
+        <!-- Community Section -->
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <div class="bg-gray-800 rounded-2xl overflow-hidden">
+                    <div class="md:flex">
+                        <div class="md:w-1/2 p-10">
+                            <h2 class="text-3xl font-bold text-white mb-6">Join Our Gaming Community</h2>
+                            <p class="text-gray-300 mb-8">Connect with millions of gamers worldwide. Share strategies, join clans, participate in tournaments, and make new friends!</p>
+                            <div class="grid grid-cols-2 gap-6 mb-8">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-blue-400 mb-2">2.5M+</div>
+                                    <div class="text-gray-400">Active Players</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-green-400 mb-2">120K+</div>
+                                    <div class="text-gray-400">Clans & Groups</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-purple-400 mb-2">15K+</div>
+                                    <div class="text-gray-400">Tournaments</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-yellow-400 mb-2">500+</div>
+                                    <div class="text-gray-400">Game Titles</div>
+                                </div>
+                            </div>
+                            <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-lg font-bold hover:opacity-90 transition">
+                                Join Now
+                            </button>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://placeholder-image-service.onrender.com/image/600x400?prompt=Multiplayer%20gaming%20community%20with%20diverse%20players%20interacting%20online&id=dd90a24f-0c21-4a62-9dcd-e72a0f40b341" alt="Multiplayer gaming community with diverse players interacting online" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button onclick="calculateGP()">Calculate GP</button>
-            <div id="gp-output" class="output"></div>
-        </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-900 border-t border-gray-800 pt-12 pb-8">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-6">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h2 class="text-xl font-bold text-white">GAME HUB</h2>
+                        </div>
+                        <p class="text-gray-400 mb-6">Your ultimate destination for gaming. Discover, play, and connect with gamers worldwide.</p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-6">Explore</h3>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-gray-400 hover:text-white">Games</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">New Releases</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Top Sellers</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Upcoming</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Categories</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Specials</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-6">Account</h3>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-gray-400 hover:text-white">My Profile</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Wishlist</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Library</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Friends</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Settings</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Redeem Code</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-6">Support</h3>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">System Status</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Refunds</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Feedback</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 mb-4 md:mb-0">© 2023 Game Hub. All rights reserved.</p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
-        function switchTab(tab) {
-            const tabs = document.querySelectorAll('.tab');
-            const contents = document.querySelectorAll('.tab-content');
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
-            document.querySelector(`[onclick*="${tab}"]`).classList.add('active');
-            document.getElementById(`${tab}-content`).classList.add('active');
-        }
-
-        function calculateAP() {
-            const a = parseFloat(document.getElementById('ap-a').value);
-            const d = parseFloat(document.getElementById('ap-d').value);
-            const n = parseInt(document.getElementById('ap-n').value);
+        // Simple interactivity for the gaming hub
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effect to game cards
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.classList.add('shadow-lg');
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.classList.remove('shadow-lg');
+                });
+            });
             
-            if (isNaN(a) || isNaN(d) || isNaN(n) || n <= 0) {
-                alert('Please enter valid numbers for all fields.');
-                return;
+            // Simulate progress bar animation
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.getAttribute('data-width');
+                setTimeout(() => {
+                    bar.style.width = width + '%';
+                }, 500);
+            });
+            
+            // Simple carousel functionality for special offers
+            const carousel = document.querySelector('.carousel');
+            if (carousel) {
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+                
+                carousel.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    startX = e.pageX - carousel.offsetLeft;
+                    scrollLeft = carousel.scrollLeft;
+                });
+                
+                carousel.addEventListener('mouseleave', () => {
+                    isDown = false;
+                });
+                
+                carousel.addEventListener('mouseup', () => {
+                    isDown = false;
+                });
+                
+                carousel.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - carousel.offsetLeft;
+                    const walk = (x - startX) * 2;
+                    carousel.scrollLeft = scrollLeft - walk;
+                });
             }
-            
-            const terms = [];
-            let sum = 0;
-            for (let i = 0; i < n; i++) {
-                const term = a + i * d;
-                terms.push(term);
-                sum += term;
-            }
-            
-            const output = document.getElementById('ap-output');
-            output.innerHTML = `<h3>Terms:</h3><p>${terms.join(', ')}</p><h3>Sum:</h3><p>${sum}</p>`;
-            output.classList.add('show');
-        }
-        
-        function calculateGP() {
-            const a = parseFloat(document.getElementById('gp-a').value);
-            const r = parseFloat(document.getElementById('gp-r').value);
-            const n = parseInt(document.getElementById('gp-n').value);
-            
-            if (isNaN(a) || isNaN(r) || isNaN(n) || n <= 0) {
-                alert('Please enter valid numbers for all fields.');
-                return;
-            }
-            
-            const terms = [];
-            let sum = 0;
-            for (let i = 0; i < n; i++) {
-                const term = a * Math.pow(r, i);
-                terms.push(term);
-                sum += term;
-            }
-            
-            const output = document.getElementById('gp-output');
-            output.innerHTML = `<h3>Terms:</h3><p>${terms.join(', ')}</p><h3>Sum:</h3><p>${sum}</p>`;
-            output.classList.add('show');
-        }
+        });
     </script>
 </body>
 </html>
-</content>
-</create_file>
