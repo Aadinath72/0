@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AP & GP Finder</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            min-height: 50px;
+            display: none;
+            text-align: left;
+        }
+        .output.show {
+            display: block;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AP & GP Finder</h1>
+        <p>Calculate an Arithmetic or Geometric Progression. Enter the parameters and click calculate.</p>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('ap')">Arithmetic Progression (AP)</div>
+            <div class="tab" onclick="switchTab('gp')">Geometric Progression (GP)</div>
+        </div>
+        
+        <div id="ap-content" class="tab-content active">
+            <div class="form-group">
+                <label for="ap-a">First Term (a):</label>
+                <input type="number" id="ap-a" step="any">
+            </div>
+            <div class="form-group">
+                <label for="ap-d">Common Difference (d):</label>
+                <input type="number" id="ap-d" step="any">
+            </div>
+            <div class="form-group">
+                <label for="ap-n">Number of Terms (n):</label>
+                <input type="number" id="ap-n" min="1">
+            </div>
+            <button onclick="calculateAP()">Calculate AP</button>
+            <div id="ap-output" class="output"></div>
+        </div>
+        
+        <div id="gp-content" class="tab-content">
+            <div class="form-group">
+                <label for="gp-a">First Term (a):</label>
+                <input type="number" id="gp-a" step="any">
+            </div>
+            <div class="form-group">
+                <label for="gp-r">Common Ratio (r):</label>
+                <input type="number" id="gp-r" step="any">
+            </div>
+            <div class="form-group">
+                <label for="gp-n">Number of Terms (n):</label>
+                <input type="number" id="gp-n" min="1">
+            </div>
+            <button onclick="calculateGP()">Calculate GP</button>
+            <div id="gp-output" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            document.querySelector(`[onclick*="${tab}"]`).classList.add('active');
+            document.getElementById(`${tab}-content`).classList.add('active');
+        }
+
+        function calculateAP() {
+            const a = parseFloat(document.getElementById('ap-a').value);
+            const d = parseFloat(document.getElementById('ap-d').value);
+            const n = parseInt(document.getElementById('ap-n').value);
+            
+            if (isNaN(a) || isNaN(d) || isNaN(n) || n <= 0) {
+                alert('Please enter valid numbers for all fields.');
+                return;
+            }
+            
+            const terms = [];
+            let sum = 0;
+            for (let i = 0; i < n; i++) {
+                const term = a + i * d;
+                terms.push(term);
+                sum += term;
+            }
+            
+            const output = document.getElementById('ap-output');
+            output.innerHTML = `<h3>Terms:</h3><p>${terms.join(', ')}</p><h3>Sum:</h3><p>${sum}</p>`;
+            output.classList.add('show');
+        }
+        
+        function calculateGP() {
+            const a = parseFloat(document.getElementById('gp-a').value);
+            const r = parseFloat(document.getElementById('gp-r').value);
+            const n = parseInt(document.getElementById('gp-n').value);
+            
+            if (isNaN(a) || isNaN(r) || isNaN(n) || n <= 0) {
+                alert('Please enter valid numbers for all fields.');
+                return;
+            }
+            
+            const terms = [];
+            let sum = 0;
+            for (let i = 0; i < n; i++) {
+                const term = a * Math.pow(r, i);
+                terms.push(term);
+                sum += term;
+            }
+            
+            const output = document.getElementById('gp-output');
+            output.innerHTML = `<h3>Terms:</h3><p>${terms.join(', ')}</p><h3>Sum:</h3><p>${sum}</p>`;
+            output.classList.add('show');
+        }
+    </script>
+</body>
+</html>
+</content>
+</create_file>
